@@ -17,3 +17,19 @@ void * allocation_mem_init0(size_t nobjets, size_t taille) {
     return pt;
 }
 
+void * reallocation_mem(void *pt, size_t nobjets, size_t taille) {
+    void * pt_realloc;
+    pt_realloc = realloc(pt, nobjets * taille);
+    if (pt_realloc == NULL)
+        erreur("Impossible de réallouer la mémoire %d * %d à l'adresse %p !\n", nobjets, taille, pt);
+    return pt_realloc;
+}
+
+void * reallocation_mem_peda(void **pt, size_t nobjets, size_t taille) {
+    void * pt_realloc;
+    pt_realloc = realloc(*pt, nobjets * taille);
+    if (pt_realloc != NULL) *pt = pt_realloc;
+    else erreur("Impossible de réallouer la mémoire %d * %d à l'adresse %p !\n", nobjets, taille, *pt);
+    return pt_realloc;
+}
+
