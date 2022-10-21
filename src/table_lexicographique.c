@@ -101,3 +101,22 @@ int inserer_lexeme(char *lexeme) {
 
 // Retourne le numéro lexico de [lexeme] s'il existe, -1 sinon
 
+int num_lexico(char *lexeme) {
+    int hashcode = hashage(lexeme),
+        lgr_lexeme = strlen(lexeme),
+        num_lexico = table_hash_code[hashcode]; // Récup du num lexico associé au hash-code (= -1 ou numero lexico)
+    while (num_lexico != -1) { // Tant qu'il y a un lexeme avec qui comparer
+        if (lexico[num_lexico].longueur == lgr_lexeme) // Même longueur ?
+            if (strcmp(lexico[num_lexico].lexeme, lexeme) == 0) // Même lexème ?
+                return num_lexico; // retour de l'indice lexico de ce lexème
+        num_lexico = lexico[num_lexico].suivant;
+        }
+    return -1;
+}
+ 
+/****************************************************************************************************************/
+                                    /*FONCTION D'AFFICHAGE DE LA TABLE LEXICO*/
+/****************************************************************************************************************/
+
+// Affiche la table lexico
+
