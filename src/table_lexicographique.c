@@ -16,7 +16,6 @@ element_table_lexico lexico[TAILLE_MAX_TABLE_LEXICO]; // Table lexico
 /****************************************************************************************************************/
 
 // Initialise la table des hash-codes
-
 void init_table_hashage() {
     // Initialisation
     for (int i = 0; i < TAILLE_MAX_HC; i++) {
@@ -29,7 +28,6 @@ void init_table_hashage() {
 /****************************************************************************************************************/
 
 // Initialise la table lexico
-
 void init_table_lexico(){
     // Initialisation
     for (int i = 0; i < TAILLE_MAX_TABLE_LEXICO; i++) {
@@ -49,7 +47,6 @@ void init_table_lexico(){
 /****************************************************************************************************************/
 
 // Renvoie le hash-code d'un lexème
-
 int hashage(char *lexeme) {
     int res = 0, total = 0,
         lgr_lexeme = strlen(lexeme);
@@ -66,7 +63,6 @@ int hashage(char *lexeme) {
 /****************************************************************************************************************/
 
 // Insère un lexème dans la table lexico s'il n'y existe pas déjà
-
 int inserer_lexeme(char *lexeme) {
     int hashcode = hashage(lexeme),
         lgr_lexeme = strlen(lexeme),
@@ -100,7 +96,6 @@ int inserer_lexeme(char *lexeme) {
 /****************************************************************************************************************/
 
 // Retourne le numéro lexico de [lexeme] s'il existe, -1 sinon
-
 int num_lexico(char *lexeme) {
     int hashcode = hashage(lexeme),
         lgr_lexeme = strlen(lexeme),
@@ -119,4 +114,23 @@ int num_lexico(char *lexeme) {
 /****************************************************************************************************************/
 
 // Affiche la table lexico
+void affichage_table_lexico() {
+    fprintf(yyout, "Affichage de la table lexicographique :\n\n");
+    for(int i = 0; i < ligne_vide; i++)
+        fprintf(yyout, "Hash-code :\t%2d\t||\tNuméro :\t%4d\t||\tLongueur :\t%3d\t||\tLexeme :\t%20s\t||\tSuivant :\t%4d\t\n", hashage(lexico[i].lexeme), i, lexico[i].longueur, lexico[i].lexeme, lexico[i].suivant);
+    fprintf(yyout, "\n\n");
+}
 
+/****************************************************************************************************************/
+                                    /*FONCTION QUI RECUPERE UN LEXEME*/
+/****************************************************************************************************************/
+
+// Retourne le lexeme correspondant au numéro lexicographique
+char * lexeme(int numero_lexico) {
+    int lgr_lexeme = strlen(lexico[numero_lexico].lexeme);
+    char *res = (char *)malloc(lgr_lexeme * sizeof(char));
+
+    strcpy(res, lexico[numero_lexico].lexeme);
+    
+    return res;
+}
