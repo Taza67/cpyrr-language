@@ -54,3 +54,32 @@ arbre creer_noeud(arbre fils, int type_noeud, int num_lexico, int num_decl, arbr
 
 // Ajoute un fils à un noeud
 
+arbre ajouter_fils(arbre noeud, arbre fils) {
+    if (estvide(noeud))
+        noeud->fils = fils;
+    else
+        erreur("ajouterfils(arbre noeud, arbre fils) : le fils du noeud n'est pas vide !\n");
+    return noeud;
+}
+
+/****************************************************************************************************************/
+                                        /*FONCTION D'AJOUT DE FRERE*/
+/****************************************************************************************************************/
+
+// Ajoute un frere à un noeud
+
+arbre ajouter_frere(arbre noeud,arbre frere) {
+    if(estvide(noeud->frere))
+        noeud->frere = frere;
+    else 
+        erreur("ajouterfrere(arbre noeud, arbre frere) : le frere du noeud n'est pas vide !\n");
+    return noeud;
+}
+/****************************************************************************************************************/
+                                        /*FONCTION D'AFFICHAGE D'UN ARBRE*/
+/****************************************************************************************************************/
+
+
+
+// Affiche l'arbre
+
