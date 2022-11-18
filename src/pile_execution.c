@@ -32,3 +32,54 @@ void init_pile_execution() {
 
 // Réserve l'espace dans la pile pour une région et renvoie l'indice de départ de la zone de données
 
+int inserer_region(int num_region) {
+    int b_c = base_courante,
+        NIS = table_regions[num_region].NIS;
+
+    if (num_region > 0) {
+        // Chainage dynamique
+        pile_execution[b_c].type = T_INT;
+        pile_execution[b_c].elem.int_valeur = ex_base_courante;
+        b_c++;
+        
+        // Chainage statique
+        if (NIS > ex_NIS) {                                             // NIS croît
+            pile_execution[b_c] = pile_execution[b_c - 1];
+            b_c++;
+            int  i = 1;
+            while (i < NIS) {
+                pile_execution[b_c] = pile_execution[ex_base_courante + i];
+                i++;
+                b_c++;
+            }
+        } else if (NIS == ex_NIS) {                                     // NIS stagne
+            int i = 0;
+            while (i < NIS) {
+                pile_execution[b_c] = pile_execution[ex_base_courante + i];
+                i++;
+                b_c++;
+            }
+        } else {                                                        // NIS décroît
+            int i = ex_NIS - NIS;
+            while (i < ex_NIS) {
+                pile_execution[b_c] = pile_execution[ex_base_courante + NIS + i];
+                i++;
+                b_c++;
+            }
+        }
+    }
+    ex_NIS = NIS;
+    ex_base_courante = base_courante;
+    base_courante = b_c + table_regions[num_region].taille;
+
+    empiler(ex_base_courante, bases_courantes);
+
+    return b_c;
+}
+
+/****************************************************************************************************************/
+                            /*FONCTION D'AFFICHAGE DE LA PILE D'EXECUTION*/
+/****************************************************************************************************************/
+
+// Affiche la pile d'exécution
+
