@@ -19,7 +19,6 @@ extern element_table_regions table_regions[TAILLE_MAX_TABLE_REGIONS];
 /****************************************************************************************************************/
 
 // Initialise la pile d'exécution
-
 void init_pile_execution() {
     initialiser(bases_courantes);
     for (int i = 0; i < TAILLE_PILE_EXEC; i++)
@@ -31,7 +30,6 @@ void init_pile_execution() {
 /****************************************************************************************************************/
 
 // Réserve l'espace dans la pile pour une région et renvoie l'indice de départ de la zone de données
-
 int inserer_region(int num_region) {
     int b_c = base_courante,
         NIS = table_regions[num_region].NIS;
@@ -82,4 +80,31 @@ int inserer_region(int num_region) {
 /****************************************************************************************************************/
 
 // Affiche la pile d'exécution
-
+void affichage_pile_execution() {
+    fprintf(yyout, "Affichage de la pile d'exécution :\n\n");
+    for (int i = 0; i < base_courante; i++) {
+        switch (pile_execution[i].type) {
+        case T_INT:
+            fprintf(yyout, "|__%4d__|    [%10d]    |\n", i, pile_execution[i].elem.int_valeur);
+            break;
+        case T_FLOAT:
+            fprintf(yyout, "|__%4d__|    [%10.5f]    |\n", i, pile_execution[i].elem.float_valeur);
+            break;
+        case T_CHAR:
+            fprintf(yyout, "|__%4d__|    [         %c]    |\n", i, pile_execution[i].elem.char_valeur);
+            break;
+        case T_BOOL:
+            fprintf(yyout, "|__%4d__|    [%10s]    |\n", i, (pile_execution[i].elem.bool_valeur == 0) ? "false" : "true");
+            break;
+        case T_STRING:
+            fprintf(yyout, "|__%4d__|    [%10s]    |\n", i, pile_execution[i].elem.string_valeur);
+            break;
+        case -1:
+            fprintf(yyout, "|__%4d__|    [          ]    |\n", i);
+            break;
+        default:
+            erreur("affichage_pile_execution() : type %d de l'élément incorrect", pile_execution->type);
+        }
+    }
+    fprintf(yyout, "\n\n");
+}
