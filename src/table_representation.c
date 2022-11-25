@@ -18,7 +18,6 @@ champs_tab tab_champ[TAILLE_MAX_TABLEAU_CHAMPS];                // Tableau de st
 /****************************************************************************************************************/
 
 // Initialise la table de représentation
-
 void init_table_representation() {
     // Initialisation
     for (int i = 0; i < TAILLE_MAX_TABLE_REPRESENTATION; i++)
@@ -30,7 +29,6 @@ void init_table_representation() {
 /****************************************************************************************************************/
 
 // Insère la représentation d'une structure dans la table
-
 void inserer_representation_structure(int nombre_champs) {
     table_representation[case_vide++] = nombre_champs;
     for (int i = 0; i < nombre_champs; i++) {
@@ -45,7 +43,6 @@ void inserer_representation_structure(int nombre_champs) {
 /****************************************************************************************************************/
 
 // Insère la représentation du tableau dans la table
-
 void inserer_representation_tableau(int type_elements, int nombre_dimensions) {
     table_representation[case_vide++] = type_elements;
     table_representation[case_vide++] = nombre_dimensions;
@@ -60,7 +57,6 @@ void inserer_representation_tableau(int type_elements, int nombre_dimensions) {
 /****************************************************************************************************************/
 
 // Insère la représentation d'une procédure dans la table
-
 void inserer_representation_procedure(int nombre_parametres) {
     table_representation[case_vide++] = nombre_parametres;
     for (int i = 0; i < nombre_parametres; i++) {
@@ -74,4 +70,27 @@ void inserer_representation_procedure(int nombre_parametres) {
 /****************************************************************************************************************/
 
 // Insère la représentation d'une fonction dans la table
+void inserer_representation_fonction(int type_retour, int nombre_parametres) {
+    table_representation[case_vide++] = type_retour;
+    table_representation[case_vide++] = nombre_parametres;
+    for (int i = 0; i < nombre_parametres; i++) {
+        table_representation[case_vide++] = tab_param[i].num_lexico;
+        table_representation[case_vide++] = tab_param[i].type;
+    }
+}
 
+/****************************************************************************************************************/
+                            /*FONCTION D'AFFICHAGE DE LA TABLE DE REPRESENTAION*/
+/****************************************************************************************************************/
+
+// Affiche la table de représentation
+void affichage_table_representation() {
+    fprintf(yyout, "Affichage de la table de réprésentation :\n\n");
+    fprintf(yyout, "|");
+    for(int i = 0; i < case_vide; i++) {
+        if (i != 0 && i % 10 == 0) fprintf(yyout, "|\n|");
+        fprintf(yyout, "|\t%d\t|", table_representation[i]);
+    }
+    if ((case_vide - 1) % 10 != 0) fprintf(yyout, "|\n");
+    fprintf(yyout, "\n\n");
+}
