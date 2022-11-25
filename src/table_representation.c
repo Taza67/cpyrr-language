@@ -46,3 +46,32 @@ void inserer_representation_structure(int nombre_champs) {
 
 // Insère la représentation du tableau dans la table
 
+void inserer_representation_tableau(int type_elements, int nombre_dimensions) {
+    table_representation[case_vide++] = type_elements;
+    table_representation[case_vide++] = nombre_dimensions;
+    for (int i = 0; i < nombre_dimensions; i++) {
+        table_representation[case_vide++] = tab_dim[i].borne_inf;
+        table_representation[case_vide++] = tab_dim[i].borne_sup;
+    }
+}
+
+/****************************************************************************************************************/
+                                    /*FONCTION D'INSERTION POUR LES PROCEDURES*/
+/****************************************************************************************************************/
+
+// Insère la représentation d'une procédure dans la table
+
+void inserer_representation_procedure(int nombre_parametres) {
+    table_representation[case_vide++] = nombre_parametres;
+    for (int i = 0; i < nombre_parametres; i++) {
+        table_representation[case_vide++] = tab_param[i].num_lexico;
+        table_representation[case_vide++] = tab_param[i].type;
+    }
+}
+
+/****************************************************************************************************************/
+                                    /*FONCTION  D'INSERTION POUR LES FONCTIONS*/
+/****************************************************************************************************************/
+
+// Insère la représentation d'une fonction dans la table
+
