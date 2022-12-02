@@ -48,3 +48,21 @@ char * creer_chemin_fichier(char *nom_dossier_parent, char *nom_fichier) {
 
 // Modifie le nom d'un fichier si le dernier est déjà attribué
 
+char * renvoyer_nom_modifie(char * nom) {
+    /* *Déclaration de variables */
+    int i = 0, taille = strlen(nom) + 2, stop = 0;
+    char * new_name = (char*)allocation_mem_init0(taille, sizeof(char));
+    strcpy(new_name, nom);
+    for (i = 0; stop != 1; i++) {
+        int verif = verifier_dossier(new_name) || verifier_fichier(new_name);
+        if (verif == 1) {
+            new_name[taille - 2] = i + '0';
+            new_name[taille - 1] = '\0';
+        } else
+            stop = 1;
+    }
+    return new_name;
+}
+
+// Demande une confirmation à l'utilisateur sur l'écrasement du fichier
+
