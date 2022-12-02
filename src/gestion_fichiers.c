@@ -10,7 +10,6 @@
 /****************************************************************************************************************/
 
 // Vérifie si un nom correspond au nom d'un dossier
-
 int verifier_dossier(char * nom_fichier) {
     DIR *is_dossier = NULL;
     int retour = 0;
@@ -23,7 +22,6 @@ int verifier_dossier(char * nom_fichier) {
 }
 
 // Vérifie si un nom correspond au nom d'un fichier
-
 int verifier_fichier(char * nom_fichier) {
     FILE *is_fichier = NULL;
     int retour = 0;
@@ -36,7 +34,6 @@ int verifier_fichier(char * nom_fichier) {
 }
 
 // Crée le chemin d'un fichier à partir de son nom et celui du dossier parent
-
 char * creer_chemin_fichier(char *nom_dossier_parent, char *nom_fichier) {
     int longueur_chemin = strlen(nom_dossier_parent) + strlen(nom_fichier) + 1;
     char *chemin = (char*)allocation_mem_init0(longueur_chemin, sizeof(char));
@@ -46,8 +43,7 @@ char * creer_chemin_fichier(char *nom_dossier_parent, char *nom_fichier) {
     return chemin;
 }
 
-// Modifie le nom d'un fichier si le dernier est déjà attribué
-
+// Modifie le nom d'un fichier si le dernier est déjà attribué 
 char * renvoyer_nom_modifie(char * nom) {
     /* *Déclaration de variables */
     int i = 0, taille = strlen(nom) + 2, stop = 0;
@@ -65,4 +61,19 @@ char * renvoyer_nom_modifie(char * nom) {
 }
 
 // Demande une confirmation à l'utilisateur sur l'écrasement du fichier
-
+void demander_confirmation_ecrasement(char * nom_fichier) {
+    int patience = 5;
+    char c = 0;
+    do {
+        // Demande de confirmation
+        avertissement("Un fichier du nom %s existe déjà !\n  Si le programme se poursuit, ce fichier sera écrasé."
+                      " Êtes-vous sûr de continuer ? (Entrez 'O' pour Oui et 'N' pour Non) -> ", nom_fichier);
+        c = getchar();
+        if (c != 'O' && c != 'N') patience--;
+        viderBuffer();
+    } while (c != 'O' && c != 'N' && patience != 0);
+    // Réponse
+    if (c == 'N' || patience == 0)
+        erreur("L'utilisateur ne souhaite pas écraser le fichier existant !\n");
+}
+        
