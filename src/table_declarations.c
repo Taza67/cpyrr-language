@@ -81,3 +81,13 @@ int inserer_declaration(int num_lexico, int num_region, int nature, int descript
 
 // Met à jour la valeur du champ execution de la déclaration d'indice_decl
 
+void inserer_execution_declaration(int indice_decl, int execution) {
+    table_declarations[indice_decl].execution = execution;
+}
+
+/****************************************************************************************************************/
+                                /*FONCTION D'AFFICHAGE DE LA TABLE DES DECLARATIONS*/
+/****************************************************************************************************************/
+
+// Affiche la table des déclarations
+
