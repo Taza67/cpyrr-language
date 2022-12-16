@@ -20,7 +20,6 @@ extern pile bases_courantes;
 /****************************************************************************************************************/
 
 // Initialise la table des déclarations
-
 void init_table_declarations() {
     // Initialisation
     for (int i = 0; i < TAILLE_MAX_TABLE_DECL; i++) {
@@ -43,7 +42,6 @@ void init_table_declarations() {
 /****************************************************************************************************************/
 
 // Calcule et retourne l'indice où sera ajoutée la nouvelle déclaration (Réalise aussi le chainage)
-
 int calculer_indice_ajout(int num_lexico) {
     // Indice de la table où sera ajoutée la déclaration
     int indice_ajout = -1;
@@ -68,7 +66,6 @@ int calculer_indice_ajout(int num_lexico) {
 /****************************************************************************************************************/
 
 // Insère une déclaration dans la table
-
 int inserer_declaration(int num_lexico, int num_region, int nature, int description) {
     // Indice de la table où sera ajoutée la déclaration
     int indice_ajout = calculer_indice_ajout(num_lexico);
@@ -80,7 +77,6 @@ int inserer_declaration(int num_lexico, int num_region, int nature, int descript
 }
 
 // Met à jour la valeur du champ execution de la déclaration d'indice_decl
-
 void inserer_execution_declaration(int indice_decl, int execution) {
     table_declarations[indice_decl].execution = execution;
 }
@@ -90,4 +86,66 @@ void inserer_execution_declaration(int indice_decl, int execution) {
 /****************************************************************************************************************/
 
 // Affiche la table des déclarations
+void affichage_table_declarations() {
+    char * natures[50] = {"Base    ", "Structure", "Tableau  ", "Variable", "Paramètre", "Procédure", "Fonction"};
+    fprintf(yyout, "Affichage de la table de déclarations :\n\n");
+    for(int i = 0; i < TAILLE_MAX_TABLE_DECL; i++)
+        if (table_declarations[i].nature != N_VIDE)
+            fprintf(yyout, "Indice :\t%d\t||\tNature :\t%s\t||\tSuivant :\t%4d\t||\tRégion :\t%3d\t||\tdescription :\t%3d\t||\tExécution :\t%3d\t\n",
+                i, natures[table_declarations[i].nature], table_declarations[i].suivant, table_declarations[i].region,
+                table_declarations[i].description, table_declarations[i].execution);
+    fprintf(yyout, "\n\n");
+}
 
+/****************************************************************************************************************/
+                                /*FONCTION DE CALCUL DU DEPLACEMENT D'UNE VARIABLE*/
+/****************************************************************************************************************/
+
+// Calcule le déplacement d'une variable
+int calculer_deplacement(arbre a) {
+    int num_reg_var = table_declarations[a->num_decl].region,
+        nis_reg_var = table_regions[num_reg_var].NIS,
+        nis_reg_app = table_regions[sommet(regions_appelantes)].NIS,
+        dec = nis_reg_app - nis_reg_var,
+        dep = 0, ind, ind_rep, borne_inf, borne_sup;
+    switch (a->type_noeud) {
+        case A_IDF:
+            if (num_reg_var == 0)
+                dep = table_declarations[a->num_decl].execution;
+            else if (num_reg_var == sommet(regions_appelantes))
+                dep = sommet(bases_courantes) - 1 + nis_reg_var + table_declarations[a->num_decl].execution;
+            else 
+                dep = pile_execution[sommet(bases_courantes) + dec].elem.int_valeur + nis_reg_var + table_declarations[a->num_decl].execution;
+            if (!estvide(a->fils)) {
+                dep += calculer_deplacement(a->fils);
+            }
+            break;
+        case A_POINT_STRUCT:
+            ind_rep = a->num_decl;
+            dep += table_representation[ind_rep + 2];
+            if (!estvide(a->fils))
+                dep += calculer_deplacement(a->fils);
+            if (!estvide(a->frere))
+                dep += calculer_deplacement(a->frere);
+            break;
+        case A_IND_TAB:
+            elem_pile_exec_t elem = evaluer_expression(a->fils);
+            if (elem.type != T_INT)
+                erreur("calculer_deplacement(arbre a) : l'indice d'un tableau doit toujours être un entier (entree : %s) !\n", type_string(elem.type));
+            ind = elem.elem.int_valeur;
+            ind_rep = table_declarations[a->num_decl].description + (2 * a->num_lexico);
+            borne_inf = table_representation[ind_rep];
+            borne_sup = table_representation[ind_rep + 1];
+            if (ind < borne_inf || ind > borne_sup)
+                erreur("calculer_deplacement(arbre a) : indice du tableau incorrect (indice : %d, borne inférieure : %d, borne supérieure : %d) !\n", ind, borne_inf, borne_sup);
+            dep = ind - borne_inf;
+            if (a->fils->frere != arbre_vide())
+                dep += dep * (borne_sup - borne_inf) + calculer_deplacement(a->fils->frere);
+            if (!estvide(a->frere))
+                dep += calculer_deplacement(a->frere);
+            break;
+        default:
+            erreur("calculer_deplacement(arbre a) : type du noeud incorrect %s !\n", type_noeud_string(a->type_noeud));
+    }
+    return dep;
+}
