@@ -81,3 +81,34 @@ int verifier_surcharge_fonc_proc(char *lexeme, int num_region, int types_param[]
 
 // Renvoie l'index dans la table de représentation du champ d'une structure
 
+int index_rep_struct(int num_decl, int num_lexico_champ) {
+    int ind_rep = table_declarations[num_decl].description,
+        nb_champs = table_representation[ind_rep++];
+    for (int i = 0; i < nb_champs; i++, ind_rep += 3)
+        if (table_representation[ind_rep] == num_lexico_champ) {
+            return ind_rep;
+        }
+    return -1;
+}
+
+/****************************************************************************************************************/
+                        /*FONCTION DE RECUPERATION DE LA DESCRIPTION D'UNE FONCTION/PROCEDURE*/
+/****************************************************************************************************************/
+
+// Récupère les infos sur une fonction/procédure
+
+void recuperer_infos_fonc_proc(int num_decl, int *type_retourne, int *nombre_params, int types_param[]) {
+    int ind_rep = table_declarations[num_decl].description,
+        nat = table_declarations[num_decl].nature, i;
+    *type_retourne = (nat == N_FONCTION) ? table_representation[ind_rep++] : -1;
+    *nombre_params = table_representation[ind_rep++];
+    for (i = 0, ind_rep++; i < *nombre_params; i++, ind_rep += 2)
+        types_param[i] = table_representation[ind_rep];
+}
+
+/****************************************************************************************************************/
+                        /*FONCTION DE RECHERCHE DE LA DERNIERE DECLARATION D'UN TYPE*/
+/****************************************************************************************************************/
+
+// Renvoie le numéro de la dernière bonne déclaration associée à un numéro lexico d"un type
+
