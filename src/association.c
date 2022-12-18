@@ -112,3 +112,74 @@ void recuperer_infos_fonc_proc(int num_decl, int *type_retourne, int *nombre_par
 
 // Renvoie le numéro de la dernière bonne déclaration associée à un numéro lexico d"un type
 
+int declaration_type(char *lexeme, int num_region) {
+    int ret = -1, it = num_lexico(lexeme), test_nat, test_region, trouve;
+    test_nat = test_region = trouve = 0;
+    if (it == -1) erreur("declaration_type(char *lexeme, int num_region) : "
+                         "Le type %s n'existe pas !\n", lexeme);
+    while(it != -1) {
+        int nat = table_declarations[it].nature;
+        if (nat == N_BASE || nat == N_STRUCTURE || nat == N_TABLEAU) {
+            test_nat = 1;
+            if (table_declarations[it].region == num_region || table_regions[table_declarations[it].region].NIS < table_regions[num_region].NIS) {
+                test_region = 1;
+                trouve = 1;
+                ret = it;
+            }
+        }
+        it = table_declarations[it].suivant;
+    }
+    if (!trouve && test_nat == 0)
+        erreur("declaration_type(char *lexeme, int num_region) : "
+               "Le lexeme %s n'est ni un type simple, ni un type structure, ni un type tableau !\n", lexeme);
+    if (!trouve && test_region == 0)
+        erreur("declaration_type(char *lexeme, int num_region) : "
+               "Le type %s n'est pas accessible depuis la région %d !\n, lexeme, num_region", lexeme, num_region);
+    return ret;
+}
+
+/****************************************************************************************************************/
+                        /*FONCTION DE RECHERCHE DE LA DERNIERE DECLARATION D'UNE VARIABLE*/
+/****************************************************************************************************************/
+
+// Renvoie le numéro de la dernière bonne déclaration associée à un numéro lexico d"une variable
+
+int declaration_var(char *lexeme, int num_region, int nature_type) {
+    int ret = -1, it = num_lexico(lexeme), test_nature_type, test_region, trouve, test_nat;
+    test_nature_type = test_region = trouve = test_nat = 0;
+    if (it == -1) erreur("declaration_var(char *lexeme, int num_region, int nature_type) : "
+                          "La variable %s n'existe pas !\n", lexeme);
+    while(it != -1) {
+        int nat = table_declarations[it].nature;
+        if (nat == N_VARIABLE || nat == N_PARAMETRE) {
+            test_nat = 1;
+            int dec_t = table_declarations[it].description;
+            if (table_declarations[dec_t].nature == nature_type) {
+                test_nature_type = 1;
+                if (table_declarations[it].region == num_region || (table_regions[table_declarations[it].region].NIS < table_regions[num_region].NIS)) {
+                    test_region = 1;
+                    trouve = 1;
+                    ret = it;
+                }
+            }
+        }
+        it = table_declarations[it].suivant;
+    }
+    if (!trouve && test_nat == 0)
+        erreur("declaration_var(char *lexeme, int num_region, int nature_type) : "
+               "Le lexeme %s n'est ni une variable, ni un paramètre !\n", lexeme);
+    if (!trouve && test_nature_type == 0)
+        erreur("declaration_var(char *lexeme, int num_region, int nature_type) : "
+               "La variable %s n'existe pas sous cette nature de type %s !\n", lexeme, nature_type);
+    if (!trouve && test_region == 0)
+        erreur("declaration_var(char *lexeme, int num_region, int nature_type) : "
+               "La variable %s n'est pas accessible depuis la région %d !\n", lexeme, num_region);
+    return ret;
+}
+
+/****************************************************************************************************************/
+                        /*FONCTION DE RECHERCHE DE LA DERNIERE DECLARATION D'UNE FONCTION*/
+/****************************************************************************************************************/
+
+// Renvoie le numéro de la dernière bonne déclaration associée à un numéro lexico d'une fonction/procédure
+
