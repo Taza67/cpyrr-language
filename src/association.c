@@ -183,3 +183,57 @@ int declaration_var(char *lexeme, int num_region, int nature_type) {
 
 // Renvoie le numéro de la dernière bonne déclaration associée à un numéro lexico d'une fonction/procédure
 
+int declaration_fonc_proc(char *lexeme, int num_region, int types_param[], int nombre_params) {
+    int ret = -1, it = num_lexico(lexeme), test_nat, test_nb_param, test_types_param, test_region, nb_p, trouve, nb_p_bis,
+        types_param_attente[TAILLE_MAX_TABLEAU_PARAMS];
+    test_nb_param = test_types_param = test_region = trouve = test_nat = 0;
+    if (it == -1) erreur("declaration_fonc(char *lexeme, int num_region, int types_param[], int nombre_params) : "
+                         "La fonction/procédure %s n'existe pas !\n", lexeme);
+    while (it != -1) {
+        int nat = table_declarations[it].nature;
+        if (nat == N_FONCTION || nat == N_PROCEDURE) {
+            int ind_rep = table_declarations[it].description,
+                i;
+            test_nat = 1;
+            if (nat == N_FONCTION) ind_rep++;
+            nb_p = table_representation[ind_rep];
+            if (nb_p == nombre_params) {
+                int types_ok = 1;
+                test_nb_param = 1;
+                for (i = 0, nb_p_bis = 0, ind_rep += 2; i < nb_p; ind_rep += 2, i++, nb_p_bis++) {
+                    types_param_attente[i] = table_representation[ind_rep];
+                    types_ok = types_ok && types_param[i] == types_param_attente[i];
+                }
+                if (types_ok) {
+                    test_types_param = 1;
+                    if (table_declarations[it].region == num_region || table_regions[table_declarations[it].region].NIS < table_regions[num_region].NIS) {
+                        test_region = 1;
+                        trouve = 1;
+                        ret = it;
+                    }
+                }
+            }
+        }
+        it = table_declarations[it].suivant;
+    }
+    if (!trouve && test_nat == 0) 
+        erreur("declaration_fonc(char *lexeme, int num_region, int types_param[], int nombre_params) : "
+               "Le lexeme %s n'est pas une fonction/procédure !\n", lexeme);
+    if (!trouve && test_nb_param == 0) 
+        erreur("declaration_fonc(char *lexeme, int num_region, int types_param[], int nombre_params) : "
+               "La fonction/procédure %s requiert un nombre d'arguments différent (Attente : %d, Entrée : %d) !\n", lexeme, nb_p, nombre_params);
+    if (!trouve && test_types_param == 0) 
+        erreur("declaration_fonc(char *lexeme, int num_region, int types_param[], int nombre_params) : "
+               "La fonction/procédure %s requiert des arguments de types différents !\nAttente : %s \nEntrée : %s\n", lexeme, liste_types_string(types_param_attente, nb_p_bis), liste_types_string(types_param, nombre_params));
+    if (!trouve && test_region == 0) 
+        erreur("declaration_fonc(char *lexeme, int num_region, int types_param[], int nombre_params) : "
+               "La fonction/procédure %s n'est pas accessible depuis la région %d !\n", lexeme, num_region);
+    return ret;
+}
+
+/****************************************************************************************************************/
+                            /*FONCTIONS DE CALCUL DU TYPE DE VARIABLES/FONCTIONS*/
+/****************************************************************************************************************/
+
+// Renvoie le numéro de déclaration du type d'un arbre représentant un idf
+
