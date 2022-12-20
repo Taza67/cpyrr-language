@@ -237,3 +237,41 @@ int declaration_fonc_proc(char *lexeme, int num_region, int types_param[], int n
 
 // Renvoie le numéro de déclaration du type d'un arbre représentant un idf
 
+int calculer_type_idf(arbre a) {
+    int type = -1;
+    switch (a->type_noeud) {
+        case A_IDF:
+            type = table_declarations[a->num_decl].description;
+            if (!estvide(a->fils)) return calculer_type_idf(a->fils);
+            return type;
+        case A_IND_TAB:
+            type = table_representation[table_declarations[a->num_decl].description];
+            if (!(estvide(a->frere))) return calculer_type_idf(a->frere);
+            return type;
+        case A_POINT_STRUCT:
+            type = table_representation[a->num_decl + 1];
+            if (!(estvide(a->frere))) return calculer_type_idf(a->frere);
+            if (!(estvide(a->fils))) return calculer_type_idf(a->fils);
+            return type;
+        default:
+            erreur("calculer_type_idf(arbre a) : le type %s n'est pas valable dans cette fonction !\n", type_noeud_string(a->type_noeud));
+    }
+    return -1;
+}
+
+// Renvoie le numéro de déclaration du type de la valeur retournée par une fonction
+
+int calculer_type_fonct(int num_decl) {
+    int type = -1;
+    if (num_decl != -1)
+        type = table_representation[table_declarations[num_decl].description];
+    else erreur("calculer_type_fonct(int num_decl) : Le numéro de déclaration de la fonction %d est incorrect !\n", num_decl);
+    return type;
+}
+
+/****************************************************************************************************************/
+                                /*FONCTION DE CALCUL DU TYPE D'UNE EXPRESSION*/
+/****************************************************************************************************************/
+
+// Renvoie le numéro déclaration du type d'une expression représenté par un arbre
+
