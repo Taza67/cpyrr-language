@@ -275,3 +275,48 @@ int calculer_type_fonct(int num_decl) {
 
 // Renvoie le numéro déclaration du type d'une expression représenté par un arbre
 
+int calculer_type(arbre a) {
+    int type = -1;
+    switch (a->type_noeud) {
+    case A_IDF: return calculer_type_idf(a);
+    case A_CSTE_E: return T_INT;
+    case A_CSTE_R: return T_FLOAT;
+    case A_CSTE_C: return T_CHAR;
+    case A_TRUE: return T_BOOL;
+    case A_FALSE: return T_BOOL;
+    case A_CSTE_S: return T_STRING;
+    case A_OR:
+    case A_AND:
+    case A_PLUS:
+    case A_MOINS:
+    case A_MULT:
+    case A_DIV:
+    case A_MOD:
+    case A_SUP:
+    case A_SUP_EGAL:
+    case A_INF:
+    case A_INF_EGAL:
+    case A_EGAL_EGAL:
+    case A_NOT_EGAL:
+        type = verifier_concordance_type(a);
+        if (verifier_type(type, a)) return type;
+        break;
+    case A_NOT:
+        type = calculer_type(a->fils);
+        if (verifier_type(type, a)) return type;
+        break;
+    case A_APPEL_FCT:
+        return calculer_type_fonct(a->num_decl);
+    default:
+        erreur("calculer_type(arbre a) : La nature de l'arbre %d ne correspond pas à celle d'une expression !\n", a->type_noeud);
+    }
+    erreur("calculer_type(arbre a) : le type %s ne convient pas à l'opération de nature : %s", type_string(type), type_noeud_string(a->type_noeud));
+    return type;
+}
+
+/****************************************************************************************************************/
+                                /*FONCTIONS DE VERIFICATION DU TYPE D'UNE EXPRESSION*/
+/****************************************************************************************************************/
+
+// Vérifie la concordance des types des opérances d'une expression représenté par un arbre et renvoie le numéro déclaration de son type
+
