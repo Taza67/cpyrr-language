@@ -15,7 +15,6 @@ extern element_table_regions table_regions[TAILLE_MAX_TABLE_REGIONS];           
 /****************************************************************************************************************/
 
 // Vérifie si une déclaration de type ne fait pas conflit avec une précédente de la même région
-
 int verifier_surcharge_type(char * lexeme, int num_region) {
     int it = num_lexico(lexeme);
     while (it != -1) {
@@ -31,7 +30,6 @@ int verifier_surcharge_type(char * lexeme, int num_region) {
 }
 
 // Vérifie si une déclaration de variable ne fait pas conflit avec une précédente du même type et de la même région
-
 int verifier_surcharge_var(char * lexeme, int type, int num_region) {
     int it = num_lexico(lexeme);
     while (it != -1) {
@@ -47,7 +45,6 @@ int verifier_surcharge_var(char * lexeme, int type, int num_region) {
 }
 
 // Vérifie si une déclaration de fonction/procedure ne fait pas conflit avec une précédente de même structure
-
 int verifier_surcharge_fonc_proc(char *lexeme, int num_region, int types_param[], int nombre_params, int nature) {
     int it = num_lexico(lexeme), nb_p, nb_p_bis,
         types_param_attente[TAILLE_MAX_TABLEAU_PARAMS];
@@ -80,7 +77,6 @@ int verifier_surcharge_fonc_proc(char *lexeme, int num_region, int types_param[]
 /****************************************************************************************************************/
 
 // Renvoie l'index dans la table de représentation du champ d'une structure
-
 int index_rep_struct(int num_decl, int num_lexico_champ) {
     int ind_rep = table_declarations[num_decl].description,
         nb_champs = table_representation[ind_rep++];
@@ -96,7 +92,6 @@ int index_rep_struct(int num_decl, int num_lexico_champ) {
 /****************************************************************************************************************/
 
 // Récupère les infos sur une fonction/procédure
-
 void recuperer_infos_fonc_proc(int num_decl, int *type_retourne, int *nombre_params, int types_param[]) {
     int ind_rep = table_declarations[num_decl].description,
         nat = table_declarations[num_decl].nature, i;
@@ -111,7 +106,6 @@ void recuperer_infos_fonc_proc(int num_decl, int *type_retourne, int *nombre_par
 /****************************************************************************************************************/
 
 // Renvoie le numéro de la dernière bonne déclaration associée à un numéro lexico d"un type
-
 int declaration_type(char *lexeme, int num_region) {
     int ret = -1, it = num_lexico(lexeme), test_nat, test_region, trouve;
     test_nat = test_region = trouve = 0;
@@ -143,7 +137,6 @@ int declaration_type(char *lexeme, int num_region) {
 /****************************************************************************************************************/
 
 // Renvoie le numéro de la dernière bonne déclaration associée à un numéro lexico d"une variable
-
 int declaration_var(char *lexeme, int num_region, int nature_type) {
     int ret = -1, it = num_lexico(lexeme), test_nature_type, test_region, trouve, test_nat;
     test_nature_type = test_region = trouve = test_nat = 0;
@@ -182,7 +175,6 @@ int declaration_var(char *lexeme, int num_region, int nature_type) {
 /****************************************************************************************************************/
 
 // Renvoie le numéro de la dernière bonne déclaration associée à un numéro lexico d'une fonction/procédure
-
 int declaration_fonc_proc(char *lexeme, int num_region, int types_param[], int nombre_params) {
     int ret = -1, it = num_lexico(lexeme), test_nat, test_nb_param, test_types_param, test_region, nb_p, trouve, nb_p_bis,
         types_param_attente[TAILLE_MAX_TABLEAU_PARAMS];
@@ -236,7 +228,6 @@ int declaration_fonc_proc(char *lexeme, int num_region, int types_param[], int n
 /****************************************************************************************************************/
 
 // Renvoie le numéro de déclaration du type d'un arbre représentant un idf
-
 int calculer_type_idf(arbre a) {
     int type = -1;
     switch (a->type_noeud) {
@@ -260,7 +251,6 @@ int calculer_type_idf(arbre a) {
 }
 
 // Renvoie le numéro de déclaration du type de la valeur retournée par une fonction
-
 int calculer_type_fonct(int num_decl) {
     int type = -1;
     if (num_decl != -1)
@@ -274,7 +264,6 @@ int calculer_type_fonct(int num_decl) {
 /****************************************************************************************************************/
 
 // Renvoie le numéro déclaration du type d'une expression représenté par un arbre
-
 int calculer_type(arbre a) {
     int type = -1;
     switch (a->type_noeud) {
@@ -318,5 +307,64 @@ int calculer_type(arbre a) {
                                 /*FONCTIONS DE VERIFICATION DU TYPE D'UNE EXPRESSION*/
 /****************************************************************************************************************/
 
-// Vérifie la concordance des types des opérances d'une expression représenté par un arbre et renvoie le numéro déclaration de son type
+// Vérifie la concordance des types des opérances d'une expression représenté par un arbre et renvoie le numéro déclaration de son type 
+int verifier_concordance_type(arbre a) {
+    int gauche_t, droite_t;
+    gauche_t = calculer_type(a->fils);
+    droite_t = calculer_type(a->fils->frere);
+    if (gauche_t == droite_t) return gauche_t;
+    else erreur("verifier_concordance_type(arbre a) : [%s] Les types des opérandes ne concordent pas (g : %s, d : %s) !\n", type_noeud_string(a->type_noeud), type_string(gauche_t), type_string(droite_t));
+    return -1;
+}
 
+// Vérifie si une expression est possible avec un type donné
+int verifier_type(int type, arbre a) {
+    switch (a->type_noeud) {
+    case A_PLUS: return type == T_INT || type == T_FLOAT || type == T_CHAR || type == T_STRING;
+    case A_MOINS: return type == T_INT || type == T_FLOAT || type == T_CHAR;
+    case A_MULT: return type == T_INT || type == T_FLOAT;
+    case A_DIV: return type == T_INT || type == T_FLOAT;
+    case A_MOD: return type == T_INT;
+    case A_OR:
+    case A_AND:
+    case A_NOT: return type == T_BOOL;
+    case A_SUP:
+    case A_SUP_EGAL:
+    case A_INF:
+    case A_INF_EGAL: return type == T_INT || type == T_FLOAT || type == T_CHAR || type == T_STRING;
+    case A_EGAL_EGAL:
+    case A_NOT_EGAL: return type == T_INT || type == T_FLOAT || type == T_CHAR || type == T_STRING || type == T_BOOL;
+    default:
+        erreur("verifier_type(int type, arbre a) : La nature de l'arbre %s ne correspond pas à celle d'une expression !\n", type_noeud_string(a->type_noeud));
+    }
+    return 0;
+}
+
+/****************************************************************************************************************/
+                                    /*FONCTIONS D'AFFICHAGE DE TYPE */
+/****************************************************************************************************************/
+
+// Renvoie une chaine de caractère représentant un type
+char * type_string(int num_decl) {
+    switch (num_decl) {
+        case -1: return "null";
+        case T_INT: return "entier";
+        case T_FLOAT: return "reel";
+        case T_CHAR: return "char";
+        case T_BOOL: return "booleen";
+        case T_STRING: return "string";
+        default: return lexeme(num_decl);
+    }
+}
+
+// Renvoie une chaine de caractère réprésentant une liste de types
+char * liste_types_string(int liste_types[TAILLE_MAX_TABLEAU_PARAMS], int taille) {
+    char * chaine = allocation_mem_init0(TAILLE_MAX_TABLEAU_PARAMS * 7, sizeof(char));
+    strcat(chaine, "( ");
+    for (int i = 0; i < taille; i++) {
+        chaine = strcat(chaine, type_string(liste_types[i]));
+        chaine = strcat(chaine, " ");
+    }
+    strcat(chaine, ")");
+    return chaine;
+}
