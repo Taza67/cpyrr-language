@@ -284,6 +284,27 @@ elem_pile_exec_t evaluer_expression(arbre a) {
 
 // Evalue une fonction / procédure
 
+void evaluer_fonc_proc(arbre a) {
+    int num_decl = a->num_decl,
+        num_region = table_declarations[num_decl].execution,
+        b_c, i = 0;
+    arbre it;
+    empiler(num_region, regions_appelantes);
+    b_c = inserer_region(num_region);
+    it = a->fils;
+    while (it != arbre_vide() && it->type_noeud == A_LISTE_P) {
+        pile_execution[b_c + i] = evaluer_expression(it->fils);
+        it = it->fils->frere;
+        i++;
+    }
+
+    evaluer_instruction(table_regions[num_region].arbre_abstrait);
+    depiler(regions_appelantes);
+    depiler(bases_courantes);
+}
+
+// Evalue la fonction lecture
+
 void evaluer_lecture(arbre a) {
     arbre it_a;
     elem_pile_exec_t elem;
