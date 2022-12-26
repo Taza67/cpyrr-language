@@ -28,7 +28,99 @@ enum {
 /****************************************************************************************************************/
 
 // Évalue un arbre représentatif d'une instruction
+void evaluer_instruction(arbre a) {
+    int dep;
+    // Si un retourne a été trouvé, on n'effectue plus les instructions suivantes jusqu'à passer à une nouvelle région
+    if (sommet(regions_appelantes) != region_courante) {
+        region_courante = sommet(regions_appelantes);
+        retourne_trouve = 0;
+        ret.type = -1;
+        evaluer_instruction(a);
+    } else if (!retourne_trouve) {
+        switch (a->type_noeud) {
+            case A_LISTE_INST:
+                evaluer_instruction(a->fils);
+                if (!estvide(a->fils->frere))
+                    evaluer_instruction(a->fils->frere);
+                break;
+            case A_AFFEC:
+                elem_pile_exec_t elem = evaluer_expression(a->fils->frere);
+                int type = calculer_type(a->fils);
+                dep = calculer_deplacement(a->fils);
+                ///////////////////////fprintf(stderr, "%d", type);
+                if (type != elem.type)
+                    erreur("evaluer_instruction(arbre a) : une affectation ne peut se faire qu'avec un même type (variable : %s, expression : %s) !\n", type_string(type), type_string(elem.type));
+                pile_execution[dep] = elem;
+                break;
+            case A_IT:
+                if (evaluer_expression(a->fils).elem.bool_valeur != 0)
+                    evaluer_instruction(a->fils->frere);
+                break;
+            case A_ITE:
+                if (evaluer_expression(a->fils).elem.bool_valeur != 0)
+                    evaluer_instruction(a->fils->frere);
+                else {
+                    arbre it = a->fils->frere->frere;
+                    int stop = 0;
+                    while (!stop && !estvide(it) && it->type_noeud == A_EI) {
+                        if (evaluer_expression(it->fils).elem.bool_valeur != 0) {
+                            evaluer_instruction(it->fils->frere);
+                            stop = 1;
+                        }
+                        it = it->frere;
+                    }
+                    if (!stop && !estvide(it)) evaluer_instruction(it->fils);
+                }
+                break;
+            case A_WHILE:
+                while (evaluer_expression(a->fils).elem.bool_valeur != 0)
+                    evaluer_instruction(a->fils->frere);
+                break;
+            case A_FOR:
+                evaluer_instruction(a->fils);
+                int cond = 1;
+                do {
+                    if (!estvide(a->fils->frere->fils))
+                        cond = evaluer_expression(a->fils->frere->fils).elem.bool_valeur;
+                    if (cond != 0) {
+                        evaluer_instruction(a->fils->frere->frere->frere);
+                        evaluer_instruction(a->fils->frere->frere);
+                    }
+                } while (cond != 0);
+                break;
+            case A_INIT_FOR:
+                if (!estvide(a->fils)) evaluer_instruction(a->fils);
+                break;
+            case A_INC_FOR:
+                if (!estvide(a->fils)) evaluer_instruction(a->fils);
+                break;
+            case A_APPEL_FCT:
+                evaluer_fonc_proc(a);
+                break;
+            case A_APPEL_PROC:
+                evaluer_fonc_proc(a);
+                break;
+            case A_LECTURE:
+                evaluer_lecture(a);
+                break;
+            case A_ECRITURE:
+                evaluer_ecriture(a);
+                break;
+            case A_INST_VIDE:
+                break;
+            case A_INST_RET:
+                retourne_trouve = 1;
+                if (!estvide(a->fils)) ret = evaluer_expression(a->fils);
+                break;
+        }
+    }
+}
 
+/****************************************************************************************************************/
+                                /*FONCTION D'EVALUATION D'UNE EXPRESSION*/
+/****************************************************************************************************************/
+
+// Évalue un arbre représentatif d'une expression
 elem_pile_exec_t evaluer_expression(arbre a) {
     elem_pile_exec_t elem_pile;
     int dep, type_operandes;
@@ -283,7 +375,6 @@ elem_pile_exec_t evaluer_expression(arbre a) {
 /****************************************************************************************************************/
 
 // Evalue une fonction / procédure
-
 void evaluer_fonc_proc(arbre a) {
     int num_decl = a->num_decl,
         num_region = table_declarations[num_decl].execution,
@@ -304,7 +395,6 @@ void evaluer_fonc_proc(arbre a) {
 }
 
 // Evalue la fonction lecture
-
 void evaluer_lecture(arbre a) {
     arbre it_a;
     elem_pile_exec_t elem;
@@ -365,7 +455,6 @@ void evaluer_lecture(arbre a) {
 }
 
 // Evalue la fonction ecriture
-
 void evaluer_ecriture(arbre a) {
     arbre it_a;
     elem_pile_exec_t elem;
@@ -454,7 +543,6 @@ void evaluer_ecriture(arbre a) {
 /****************************************************************************************************************/
 
 // Retourne une chaine de caractère sans les guillemets
-
 char * enlever_quotes(char * chaine) {
     char * ret;
     int taille = strlen(chaine) - 2;
@@ -466,4 +554,3 @@ char * enlever_quotes(char * chaine) {
     } else
         return chaine;
 }
-
