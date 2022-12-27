@@ -4,6 +4,7 @@
  */
 
 #include "gestion_arbres.h"
+#include "association.h"
 
 extern FILE *yyout;
 
