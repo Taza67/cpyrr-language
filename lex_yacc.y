@@ -14,7 +14,7 @@
     #include "../inc/gestion_fichiers.h"
 
     int yylex();
-    int yyerror(char *s);
+    int yyerror(const char *s);
     
     // Lex
     extern char *yytext;
@@ -699,7 +699,7 @@ suite_ecriture                                      :                           
 
 %%
 
-int yyerror(char *s) {
+int yyerror(const char *s) {
     erreur("Syntaxe incorrecte à la ligne %d, caractère %d, mot %d : %s !\n", num_ligne, num_caractere, num_mot, yytext);
     return EXIT_FAILURE;
 }
