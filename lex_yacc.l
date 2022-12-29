@@ -12,6 +12,9 @@
         num_mot++; 
         num_caractere += yyleng;
     }
+    int yywrap() {
+        return 1;
+    }
 %}
 
 /* Commentaire */
