@@ -705,6 +705,8 @@ int yyerror(const char *s) {
 }
 
 int main(int argc, char *argv[]) {
+    // Journalisation des erreurs et avertissements sur la sortie standard des erreurs
+    log_error = stderr;
     // Vérification des arguments
     if (argc < 2 || argc > 4) usage(argv[0], "Le nombre d'arguments %d n'est pas correct !\n", argc);
     if (strcmp(argv[1], "-h") == 0) usage(argv[0], "");
