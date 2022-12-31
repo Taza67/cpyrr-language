@@ -1,5 +1,5 @@
-#ifndef _ALLOCATIOn_H_
-#define _ALLOCATIOn_H_
+#ifndef _ALLOCATION_H_
+#define _ALLOCATION_H_
 
 #include <stdio.h>
 #include <stdlib.h>
