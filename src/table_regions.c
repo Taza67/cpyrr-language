@@ -32,7 +32,7 @@ void affichage_table_regions() {
     fprintf(yyout, "Affichage de la table des régions :\n\n");
     for(int i = 0; i < TAILLE_MAX_TABLE_REGIONS; i++)
         if (table_regions[i].NIS != -1)
-            fprintf(yyout, "Indice : %d, Taille : %d, NIS : %d\n",
+            fprintf(yyout, "Indice :\t%3d\t||\tTaille :\t%3d\t||\tNIS :\t%3d\t\n",
                    i, table_regions[i].taille, table_regions[i].NIS);
     fprintf(yyout, "\n\n");
 }
