@@ -67,7 +67,7 @@ void demander_confirmation_ecrasement(char * nom_fichier) {
     do {
         // Demande de confirmation
         avertissement("Un fichier du nom %s existe déjà !\n  Si le programme se poursuit, ce fichier sera écrasé."
-                      " Êtes-vous sûr de continuer ? -> ", nom_fichier);
+                      " Êtes-vous sûr de continuer ? (Entrez 'O' pour Oui et 'N' pour Non) -> ", nom_fichier);
         c = getchar();
         if (c != 'O' && c != 'N') patience--;
         viderBuffer();
